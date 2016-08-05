@@ -63,8 +63,8 @@ namespace BuilderTests
         {
             _builder.Add("NodeUnderRoot");
 
-            var ele = _builder.XmlData.Elements().First(e => e.Name.LocalName == "TestRootElement");
-            var node = ele.Elements().First(e => e.Name.LocalName == "NodeUnderRoot");
+            var root = _builder.XmlData.Elements().First(e => e.Name.LocalName == "TestRootElement");
+            var node = root.Elements().First(e => e.Name.LocalName == "NodeUnderRoot");
             Assert.AreEqual("NodeUnderRoot",node.Name.LocalName);
         }
 
@@ -73,8 +73,8 @@ namespace BuilderTests
         {
             _builder.Add("NodeUnderRoot", "Node Value");
 
-            var ele = _builder.XmlData.Elements().First(e => e.Name.LocalName == "TestRootElement");
-            var val = ele.Elements().First(e => e.Name.LocalName == "NodeUnderRoot").Value;
+            var root = _builder.XmlData.Elements().First(e => e.Name.LocalName == "TestRootElement");
+            var val = root.Elements().First(e => e.Name.LocalName == "NodeUnderRoot").Value;
 
             Assert.AreEqual("Node Value", val);
         }
@@ -90,8 +90,8 @@ namespace BuilderTests
 
             _builder.Add("NodeUnderRoot", attrs);
 
-            var ele = _builder.XmlData.Elements().First(e => e.Name.LocalName == "TestRootElement");
-            var node = ele.Elements().First(e => e.Name.LocalName == "NodeUnderRoot");
+            var root = _builder.XmlData.Elements().First(e => e.Name.LocalName == "TestRootElement");
+            var node = root.Elements().First(e => e.Name.LocalName == "NodeUnderRoot");
 
             var attrCount = node.Attributes().Count();
 
@@ -109,8 +109,8 @@ namespace BuilderTests
 
             _builder.Add("NodeUnderRoot", "Node Value", attrs);
 
-            var ele = _builder.XmlData.Elements().First(e => e.Name.LocalName == "TestRootElement");
-            var node = ele.Elements().First(e => e.Name.LocalName == "NodeUnderRoot");
+            var root = _builder.XmlData.Elements().First(e => e.Name.LocalName == "TestRootElement");
+            var node = root.Elements().First(e => e.Name.LocalName == "NodeUnderRoot");
 
             var val = node.Value;
             var attrCount = node.Attributes().Count();
@@ -126,12 +126,104 @@ namespace BuilderTests
 
             _builder.Add("NodeUnderRoot", amount);
 
-            var ele = _builder.XmlData.Elements().First(e => e.Name.LocalName == "TestRootElement");
-            var nodeCount = ele.Elements().Where(e => e.Name.LocalName == "NodeUnderRoot").ToList().Count;
+            var root = _builder.XmlData.Elements().First(e => e.Name.LocalName == "TestRootElement");
+            var nodeCount = root.Elements().Where(e => e.Name.LocalName == "NodeUnderRoot").ToList().Count;
 
             Assert.AreEqual(amount, nodeCount);
         }
 
+
+        #endregion
+
+        #region Add Range of elements (Basic)
+
+        [Test]
+        public void Builder_Should_Be_Able_To_Add_A_Range_Of_Elements()
+        {
+            var elements = new string[] {"ElementOne", "ElementTwo", "ElementThree", "ElementFour"};
+
+            _builder.AddRange(elements);
+
+            var root = _builder.XmlData.Elements().First(e => e.Name.LocalName == "TestRootElement");
+            var eles = root.Elements().ToList();
+
+            var i = 0;
+            foreach (var ele in eles)
+            {
+                Assert.AreEqual(elements[i],ele.Name.LocalName);
+                i++;
+            }
+
+            Assert.AreEqual(4,eles.Count);
+        }
+
+        [Test]
+        public void Builder_Should_Be_Able_To_Add_A_Range_Of_Elements_With_Values()
+        {
+            var elements = new KeyValuePair<string, string>[]
+            {
+                new KeyValuePair<string, string>("ElementOne", "Element one's value"),
+                new KeyValuePair<string, string>("ElementTwo", "Element two's value"),
+                new KeyValuePair<string, string>("ElementThree", "Element three's value") 
+            };
+
+            _builder.AddRange(elements);
+
+            var root = _builder.XmlData.Elements().First(e => e.Name.LocalName == "TestRootElement");
+            var eles = root.Elements().ToList();
+
+            var i = 0;
+            foreach (var ele in eles)
+            {
+                Assert.AreEqual(elements[i].Key,ele.Name.LocalName);
+                Assert.AreEqual(elements[i].Value, ele.Value);
+                i++;
+            }
+
+            Assert.AreEqual(3,eles.Count);
+        }
+
+        [Test]
+        public void Builder_Should_Be_Able_To_Add_A_Range_Of_Elements_And_Values_With_Matching_Attributes()
+        {
+            var elements = new KeyValuePair<string, string>[]
+            {
+                new KeyValuePair<string, string>("ElementOne", "Element one's value"),
+                new KeyValuePair<string, string>("ElementTwo", "Element two's value"),
+                new KeyValuePair<string, string>("ElementThree", "Element three's value")
+            };
+
+            var attrs = new KeyValuePair<string, string>[]
+            {
+                new KeyValuePair<string, string>("attrOne", "Attribute One"),
+                new KeyValuePair<string, string>("attrTwo", "Attribute Two"),
+                new KeyValuePair<string, string>("attrThree", "Attribute Three")
+            };
+
+            _builder.AddRange(elements, attrs);
+
+            var root = _builder.XmlData.Elements().First(e => e.Name.LocalName == "TestRootElement");
+            var eles = root.Elements().ToList();
+
+            var i = 0;
+            Assert.AreEqual(3, eles.Count);
+            foreach (var ele in eles)
+            {
+                Assert.AreEqual(3, ele.Attributes().Count());
+                var attributes = ele.Attributes().ToList();
+                for(var a = 0; a < ele.Attributes().Count(); a++)
+                {
+                    Assert.AreEqual(attrs[a].Key, attributes[a].Name.LocalName);
+                    Assert.AreEqual(attrs[a].Value, attributes[a].Value);
+                }
+
+                Assert.AreEqual(elements[i].Key,ele.Name.LocalName);
+                Assert.AreEqual(elements[i].Value, ele.Value);
+                i++;
+            }
+
+
+        }
 
         #endregion
     }
