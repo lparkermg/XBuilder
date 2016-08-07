@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Builder = BuildXDoc.Builder;
@@ -56,7 +57,7 @@ namespace BuilderTests
         }
         #endregion
 
-        #region Adding Elements (Basic)
+        #region Adding Elements
 
         [Test]
         public void Builder_Should_Be_Able_To_Add_Without_Value_In_Element()
@@ -133,9 +134,92 @@ namespace BuilderTests
         }
 
 
+        //TODO: Add AddIn methods.
+        [Test]
+        public void Builder_Should_Be_Able_To_Add_To_Selected_Element_Index()
+        {
+            var amount = 5;
+
+            _builder.Add("NodeUnderRoot",amount);
+
+            _builder.AddIn("NodeUnderNode","NodeUnderRoot",2);
+
+            var root = _builder.XmlData.Elements().Where(e => e.Name.LocalName == "NodeUnderRoot").ToList();
+            var nodeToCheck = root[2];
+            var subNodes = nodeToCheck.Elements().Where(e => e.Name.LocalName == "NodeUnderNode").ToList();
+            var subNodeCount = subNodes.Count;
+
+            Assert.AreEqual(1,subNodeCount);
+            Assert.AreEqual("", subNodes[0].Value);
+        }
+
+        [Test]
+        public void Builder_Should_Be_Able_To_Add_To_Selected_Element_With_Value()
+        {
+            var amount = 5;
+
+            _builder.Add("NodeUnderRoot",amount);
+
+            _builder.AddIn(new KeyValuePair<string, string>("NodeUnderNode", "This is under a node..."),"NodeUnderRoot",3);
+
+            var root = _builder.XmlData.Elements().Where(e => e.Name.LocalName == "NodeUnderRoot").ToList();
+            var nodeToCheck = root[3];
+            var subNodes = nodeToCheck.Elements().Where(e => e.Name.LocalName == "NodeUnderNode").ToList();
+            var subNodeCount = subNodes.Count;
+
+            Assert.AreEqual(1,subNodeCount);
+            Assert.AreEqual("This is under a node...", subNodes[0].Value);
+        }
+
+        [Test]
+        public void Builder_Should_Be_Able_To_Add_To_Selected_Element_With_Multiple_Elements_And_Values()
+        {
+            var amount = 5;
+
+            var subElements = new KeyValuePair<string, string>[]
+            {
+                new KeyValuePair<string, string>("SubElementOne","This is sub element one."),
+                new KeyValuePair<string, string>("SubElementTwo", "This is sub element two."),
+                new KeyValuePair<string, string>("SubElementThree", "This is sub element three.") 
+            };
+
+            _builder.Add("NodeUnderRoot", amount);
+
+            _builder.AddIn(subElements, "NodeUnderRoot", 4);
+
+            var root = _builder.XmlData.Elements().Where(e => e.Name.LocalName == "NodeUnderRoot").ToList();
+            var nodeToCheck = root[4];
+            var subNodes = nodeToCheck.Elements().Where(e => e.Name.LocalName == "NodeUnderNode").ToList();
+            var subNodeCount = subNodes.Count;
+
+            Assert.AreEqual(3,subNodeCount);
+
+            var count = 0;
+
+            foreach (var node in subNodes)
+            {
+                Assert.AreEqual(subElements[count].Key,node.Name.LocalName);
+                Assert.AreEqual(subElements[count].Value,node.Value);
+                count++;
+            }
+        }
+
+        [Test]
+        public void Builder_Should_Throw_IndexOutOfRange_Exception_On_Index_Passed_Being_Higher_Than_Index()
+        {
+            var amount = 5;
+
+            _builder.Add("NodeUnderRoot",amount);
+
+            Assert.Throws<IndexOutOfRangeException>(() =>
+            {
+                _builder.AddIn("NodeUnderNode", "NodeUnderRoot", 7);
+            });
+        }
+
         #endregion
 
-        #region Add Range of elements (Basic)
+        #region Add Range of elements
 
         [Test]
         public void Builder_Should_Be_Able_To_Add_A_Range_Of_Elements()
@@ -221,8 +305,6 @@ namespace BuilderTests
                 Assert.AreEqual(elements[i].Value, ele.Value);
                 i++;
             }
-
-
         }
 
         #endregion
