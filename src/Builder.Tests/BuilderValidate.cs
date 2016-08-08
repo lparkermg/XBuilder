@@ -144,7 +144,7 @@ namespace BuilderTests
 
             _builder.AddIn("NodeUnderNode","NodeUnderRoot",2);
 
-            var root = _builder.XmlData.Elements().Where(e => e.Name.LocalName == "NodeUnderRoot").ToList();
+            var root = _builder.XmlData.Elements().First(e => e.Name.LocalName == "TestRootElement").Elements().Where(e => e.Name.LocalName == "NodeUnderRoot").ToList();
             var nodeToCheck = root[2];
             var subNodes = nodeToCheck.Elements().Where(e => e.Name.LocalName == "NodeUnderNode").ToList();
             var subNodeCount = subNodes.Count;
@@ -162,7 +162,7 @@ namespace BuilderTests
 
             _builder.AddIn(new KeyValuePair<string, string>("NodeUnderNode", "This is under a node..."),"NodeUnderRoot",3);
 
-            var root = _builder.XmlData.Elements().Where(e => e.Name.LocalName == "NodeUnderRoot").ToList();
+            var root = _builder.XmlData.Elements().First(e => e.Name.LocalName == "TestRootElement").Elements().Where(e => e.Name.LocalName == "NodeUnderRoot").ToList();
             var nodeToCheck = root[3];
             var subNodes = nodeToCheck.Elements().Where(e => e.Name.LocalName == "NodeUnderNode").ToList();
             var subNodeCount = subNodes.Count;
@@ -187,9 +187,9 @@ namespace BuilderTests
 
             _builder.AddIn(subElements, "NodeUnderRoot", 4);
 
-            var root = _builder.XmlData.Elements().Where(e => e.Name.LocalName == "NodeUnderRoot").ToList();
+            var root = _builder.XmlData.Elements().First(e => e.Name.LocalName == "TestRootElement").Elements().Where(e => e.Name.LocalName == "NodeUnderRoot").ToList();
             var nodeToCheck = root[4];
-            var subNodes = nodeToCheck.Elements().Where(e => e.Name.LocalName == "NodeUnderNode").ToList();
+            var subNodes = nodeToCheck.Elements().ToList();
             var subNodeCount = subNodes.Count;
 
             Assert.AreEqual(3,subNodeCount);
