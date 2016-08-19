@@ -5,13 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using BuildXDoc.Exceptions;
 
 namespace BuildXDoc
 {
     //TODO: Document each function.
     //TODO: Document how the element and attribute KeyValuePairs are KeyValuePair<Name,Value>.
     //TODO: Look at swapping amount and toWhere in all the functions
-    //TODO: Look at adding a function (or function set) to select a specific node.
+    //TODO: Look into change string.IsNullOrEmpty to IsNullOrWhitespace where needed...
     public class Builder
     {
         public XDocument XmlData { get; private set; }
@@ -220,5 +221,43 @@ namespace BuildXDoc
         }
 
         #endregion
+
+        #region Setting the SelectedElement
+        public void Select(string toSelect, int index = 0)
+        {
+            if(string.IsNullOrEmpty(toSelect))
+                throw new FormatException("The element cannot be null, empty or whitespace.");
+
+            var eles = SelectedElement.Elements().Where(e => e.Name.LocalName == toSelect).ToList();
+
+            if(eles.Count == 0)
+                throw new XElementNotFoundException($"Element {toSelect} not found.");
+
+            SelectedElement = eles[index];
+        }
+
+        public void SelectIn(string element, string toSelect, int elementIndex = 0, int toSelectIndex = 0)
+        {
+            if (string.IsNullOrEmpty(element))
+                throw new FormatException("The element cannot be null, empty or whitespace.");
+
+            if(string.IsNullOrEmpty(toSelect))
+                throw new FormatException("The element to select cannot be null, empty or whitespace.");
+
+            var eles = SelectedElement.Elements().Where(e => e.Name.LocalName == element).ToList();
+
+            if(eles.Count == 0)
+                throw new XElementNotFoundException($"Element {element} not found.");
+
+            var elesSelect = eles[elementIndex].Elements().Where(e => e.Name.LocalName == toSelect).ToList();
+
+            if(elesSelect.Count == 0)
+                throw new XElementNotFoundException($"Element {toSelect} not found.");
+
+            SelectedElement = elesSelect[toSelectIndex];
+        }
+
+        #endregion
+
     }
 }
