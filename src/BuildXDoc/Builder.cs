@@ -132,9 +132,7 @@ namespace BuildXDoc
         public void AddRange(KeyValuePair<string, string>[] elesAndValues, KeyValuePair<string, string>[] attributes,
             int amount = 1)
         {
-
             var attrs = new List<XAttribute>();
-
             
             foreach (var pair in attributes)
             {
@@ -167,7 +165,7 @@ namespace BuildXDoc
             var eles = SelectedElement.Elements().Where(e => e.Name.LocalName == elementToPlaceUnder).ToList();
 
             if(eles.Count < index)
-                throw new IndexOutOfRangeException("Error placing ");
+                throw new IndexOutOfRangeException("Error adding new sub element");
 
             for (var i = 0; i < amount; i++)
             {
@@ -185,6 +183,9 @@ namespace BuildXDoc
                 throw new FormatException("The element in which you're placing under cannot be null, empty or whitespace.");
 
             var eles = SelectedElement.Elements().Where(e => e.Name.LocalName == elementToPlaceUnder).ToList();
+
+            if(eles.Count < index)
+                throw new IndexOutOfRangeException("Error adding new sub element");
 
             for (var i = 0; i < amount; i++)
             {
@@ -205,6 +206,9 @@ namespace BuildXDoc
                 throw new FormatException("The element in which you're placing under cannot be null, empty or whitespace.");
 
             var eles = SelectedElement.Elements().Where(e => e.Name.LocalName == elementToPlaceUnder).ToList();
+
+            if(eles.Count < index)
+                throw new IndexOutOfRangeException("Error adding new sub element");
 
             for (var i = 0; i < amount; i++)
             {
