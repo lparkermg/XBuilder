@@ -416,6 +416,24 @@ namespace BuilderTests
         }
 
         [Test]
+        public void Builder_Should_Throw_XElementNotFoundException_If_Element_Index_Is_Higher_Than_Element_Count()
+        {
+            var elements = new KeyValuePair<string, string>[]
+            {
+                new KeyValuePair<string, string>("ElementOne", "Element one's value"),
+                new KeyValuePair<string, string>("ElementTwo", "Element two's value"),
+                new KeyValuePair<string, string>("ElementTwo", "Element two, Its value"), 
+                new KeyValuePair<string, string>("ElementThree", "Element three's value")
+            };
+
+            _builder.AddRange(elements);
+            Assert.Throws<XElementNotFoundException>(() =>
+            {
+                _builder.Select("ElementTwo",16);
+            });
+        }
+
+        [Test]
         public void Builder_Should_Throw_XElementNotFoundException_If_The_Element_Top_Get_The_Sub_Element_From_Isnt_Found()
         {
             var elements = new KeyValuePair<string, string>[]
@@ -467,6 +485,32 @@ namespace BuilderTests
             });
         }
 
+        [Test]
+        public void Builder_Should_Throw_XElementNotFoundException_If_SubElement_Index_Is_Higher_Than_Element_Count()
+        {
+            var elements = new KeyValuePair<string, string>[]
+            {
+                new KeyValuePair<string, string>("ElementOne", "Element one's value"),
+                new KeyValuePair<string, string>("ElementTwo", "Element two's value"),
+                new KeyValuePair<string, string>("ElementTwo", "Element two, Its value"),
+                new KeyValuePair<string, string>("ElementThree", "Element three's value")
+            };
+
+            var subElements = new KeyValuePair<string, string>[]
+            {
+                new KeyValuePair<string, string>("SubElementOne", "Element one's value"),
+                new KeyValuePair<string, string>("SubElementTwo", "Element two's value"),
+                new KeyValuePair<string, string>("SubElementTwo", "Element two, Its value"),
+                new KeyValuePair<string, string>("SubElementThree", "Element three's value")
+            };
+
+            _builder.AddRange(elements);
+            _builder.AddIn(subElements,"ElementTwo",1);
+            Assert.Throws<XElementNotFoundException>(() =>
+            {
+                _builder.SelectIn("ElementTwo","SubElementTwo",1, 16);
+            });
+        }
 
         #endregion
 

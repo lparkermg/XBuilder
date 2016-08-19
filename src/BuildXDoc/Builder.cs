@@ -233,6 +233,8 @@ namespace BuildXDoc
             if(eles.Count == 0)
                 throw new XElementNotFoundException($"Element {toSelect} not found.");
 
+            if(eles.Count < index)
+                throw new XElementNotFoundException("The element index is too high.");
             SelectedElement = eles[index];
         }
 
@@ -249,10 +251,16 @@ namespace BuildXDoc
             if(eles.Count == 0)
                 throw new XElementNotFoundException($"Element {element} not found.");
 
+            if(eles.Count < elementIndex)
+                throw new XElementNotFoundException("The element index is too high.");
+
             var elesSelect = eles[elementIndex].Elements().Where(e => e.Name.LocalName == toSelect).ToList();
 
             if(elesSelect.Count == 0)
                 throw new XElementNotFoundException($"Element {toSelect} not found.");
+
+            if(elesSelect.Count < toSelectIndex)
+                throw new XElementNotFoundException("The sub element index is too high.");
 
             SelectedElement = elesSelect[toSelectIndex];
         }
